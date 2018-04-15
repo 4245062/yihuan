@@ -1,0 +1,111 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%
+	String contextPath = request.getContextPath();
+%>
+<%
+	String uuid = request.getParameter("uuid");
+	if (uuid == null) {
+		uuid = "";
+	}
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<jsp:include page="../../inc.jsp"></jsp:include>
+<script type="text/javascript">
+	var submitForm = function($dialog, $grid, $pjq, $mainMenu) {
+		if ($('form').form('validate')) {
+			var url;
+			
+				url = sy.contextPath + '/base/syresource!doNotNeedSecurity_updateqyxx.sy';
+			
+			$.post(url, sy.serializeObject($('form')), function(result) {
+				if (result.success) {
+					
+					$grid.treegrid('reload');
+					$dialog.dialog('destroy');
+					$mainMenu.tree('reload');
+					
+				} else {
+					$pjq.messager.alert('提示', result.msg, 'error');
+				}
+			}, 'json');
+		}
+	};
+	/*var showIcons = function() {
+		var dialog = parent.sy.modalDialog({
+			title : '浏览小图标',
+			url : sy.contextPath + '/style/icons.jsp',
+			buttons : [ {
+				text : '确定',
+				handler : function() {
+					dialog.find('iframe').get(0).contentWindow.selectIcon(
+							dialog, $('#iconCls'));
+				}
+			} ]
+		});
+	};*/
+	$(function() {
+			console.info("uuid:"+<%=uuid%>);
+		if (<%=uuid%>!='undefined') {
+			parent.$.messager.progress({
+				text : '数据加载中....'
+			});
+			$
+					.post(
+							sy.contextPath + '/base/syresource!doNotNeedSecurity_selectqyxxByid.sy',
+							{
+								uuid : <%=uuid%>,
+							},
+							function(result) {
+								if (1==1) {
+									$('form')
+											.form(
+													'load',
+													{
+														'uuid' : result[0].uuid,
+														'name': result[0].name,
+														'taxno' :result[0].taxno,
+														'tel' : result[0].tel,
+														'address' : result[0].address,
+													});
+									$('#iconCls').attr('class', result.iconCls);//设置背景图标
+								}
+								parent.$.messager.progress('close');
+							}, 'json');
+		}
+	});
+</script>
+</head>
+<body>
+	<form method="post" class="form">
+		<fieldset>
+			<legend>企业本信息</legend>
+			<input name="data.pageId" type="hidden"/>
+			<table class="table" style="width: 100%;">
+				<tr>
+					<th>uuid</th>
+					<td><input name="uuid"  /></td>
+					<th>名称</th>
+					<td><input name="name"  /></td>
+				</tr>
+				<tr>
+					<th>税号</th>
+					<td><input name="taxno" /></td>
+					<th>电话</th>
+					<td><input name="tel"/></td>
+				</tr>
+				<tr>
+					<th>地址</th>
+					<td><input name="address" /></td>
+					
+				</tr>
+				
+				
+			</table>
+		</fieldset>
+	</form>
+</body>
+</html>
